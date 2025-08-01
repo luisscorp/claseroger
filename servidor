@@ -1,0 +1,107 @@
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import java.lang.Math;
+
+public class Servidor {
+    public static void main(String[] args) throws IOException {
+
+        ServerSocket servidor = new ServerSocket(5000);
+        System.out.println("Esperando conexión...........");
+
+        Socket socket = servidor.accept();
+        System.out.println("Cliente conectado.");
+
+        DataInputStream in = new DataInputStream(socket.getInputStream());
+        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+
+        boolean activo = true;
+
+        while (activo) {
+
+            String menu = "\n SELECIONA ALGO DE NUESTRO MENU: \n1. :::::::::SUMA DE NUMEROS:::::::\n2.:::::::::::::::SENO::::::::::\n3.:::::::::::::COSENO::::::::::::::::::\n4.::::::::::::::::::: RAIZ CUADRADA:::::::::::::::\n5.::::::::::::POTENCIA:::::::::::::::\n6. :::::::::::::::::::SALIR:::::::::::";
+            out.writeUTF(menu);
+            System.out.println(" Menu enviado al cliente...");
+
+            System.out.println("Esperando que el cliente elija una opcion...");
+            int opcion = in.readInt();
+            System.out.println(" Opcion que eligio: " + opcion);
+
+            switch (opcion) {
+
+                case 1: // Suma
+                    System.out.println("Opcion: suma de numeros");
+                    int cantidad = in.readInt();
+                    ArrayList<Double> numeros = new ArrayList<>();
+                    double suma = 0;
+
+                    System.out.println(" Validando datos...");
+                    for (int i = 0; i < cantidad; i++) {
+                        double num = in.readDouble();
+                        numeros.add(num);
+                        suma += num;
+                    }
+
+                    String resultadoSuma = "La suma es: " + suma;
+                    out.writeUTF(resultadoSuma);
+                    System.out.println("Enviando respuesta...");
+                    break;
+
+                case 2: // Seno
+                    System.out.println("Opción: Seno");
+                    System.out.println("Validando datos...");
+                    double anguloSeno = in.readDouble();
+                    String resultadoSeno = "El seno de " + anguloSeno + " es: " + Math.sin(anguloSeno);
+                    out.writeUTF(resultadoSeno);
+                    System.out.println("Enviando respuesta...");
+                    break;
+
+                case 3: // Coseno
+                    System.out.println(" Opcion: Coseno");
+                    System.out.println(" Validando datos...");
+                    double anguloCos = in.readDouble();
+                    String resultadoCos = "El coseno de " + anguloCos + " es: " + Math.cos(anguloCos);
+                    out.writeUTF(resultadoCos);
+                    System.out.println("Enviando respuesta...");
+                    break;
+
+                case 4: // Raíz cuadrada
+                    System.out.println(" Opcion: raiz Cuadrada");
+                    System.out.println(" Validando datos...");
+                    double numRaiz = in.readDouble();
+                    if (numRaiz >= 0) {
+                        out.writeUTF("La raiz cuadrada de " + numRaiz + " es: " + Math.sqrt(numRaiz));
+                    } else {
+                        out.writeUTF("el numero debe ser positivo.");
+                    }
+                    System.out.println(" Enviando respuesta...");
+                    break;
+
+                case 5: // Potencia
+                    System.out.println("Opcion: potencia");
+                    System.out.println(" Validando datos...");
+                    double base = in.readDouble();
+                    double exponente = in.readDouble();
+                    String resultadoPot = base + " elevado a " + exponente + " es: " + Math.pow(base, exponente);
+                    out.writeUTF(resultadoPot);
+                    System.out.println(" Enviando respuesta...");
+                    break;
+
+                case 6: // Salir
+                    System.out.println(" El cliente ha elegido salir.");
+                    out.writeUTF("Terminando conexion.");
+                    activo = false;
+                    break;
+
+                default:
+                    out.writeUTF("Opcion no valida.");
+                    System.out.println("Opcion no valida.");
+            }
+        }
+
+        socket.close();
+        servidor.close();
+        System.out.println(" Conexion cerrada.");
+    }
+}
+
